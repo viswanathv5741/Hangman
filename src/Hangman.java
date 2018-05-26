@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import java.util.Scanner;
@@ -35,7 +36,8 @@ public class Hangman implements KeyListener {
 		frame.add(panel);
 		frame.setVisible(true);
 		frame.pack();
-		instructions.addKeyListener((KeyListener)this);
+		panel.addKeyListener(this);
+		frame.addKeyListener(this);
 		words = new ArrayList<String>();
 		guess = new Stack<String>();
 		guess.setSize(x);
@@ -46,15 +48,20 @@ public class Hangman implements KeyListener {
 		try {
 			Scanner file = new Scanner(new File("dictionary.txt"));
 			int index = 0;
+			int interval = (int)(Math.random()*100);
 			while(file.hasNextLine() && index < x){
 				words.add(file.nextLine());
 				index ++;
+				for (int i=0; i<interval; i++) {
+					file.nextLine();
+				}
 			}
-			System.out.println(words.size());
-			for (int i=0; i<words.size(); i++) {
+			//System.out.println(words.size());
+			for (int i=0; i<x; i++) {
 				int rand = (int) (Math.random()*words.size());
 				guess.push(words.get(rand));
-				i--;
+//				System.out.println(words.size());
+//				System.out.println(i);
 			}
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
@@ -64,6 +71,7 @@ public class Hangman implements KeyListener {
 	
 	public void Play() {
 		correct = guess.pop();
+		//System.out.println(correct);
 		for (int j=0; j<correct.length(); j++) {
 			display += "_";
 		}
@@ -73,34 +81,39 @@ public class Hangman implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 		// TODO Auto-generated method stub
-		int changes = 0;
-		for (int i=0; i<correct.length(); i++) {
-			if (correct.charAt(i) == (e.getKeyChar())) {
-				display = display.substring(0, i) + correct.charAt(i) + display.substring(i+1);
-				for (int x=0; x<display.length(); x++) {
-					if (display.charAt(x) == '_'){
-						changes ++;
-					}
-				}
-			}
-			else {
-				live --;
-			}
-		}
-		if (changes == 0) {
-			solve ++;
-			live = 9;
-			Play();
-		}
-		if (live == 0) {
-			panel.removeAll();
-		}
 	}
 
 	@Override
 	public void keyPressed(KeyEvent e) {
 		// TODO Auto-generated method stub
-		
+		System.out.println("hello from keyPressed");
+		int changes = 0;
+		for (int i=0; i<correct.length(); i++) {
+			if (correct.charAt(i) == (e.getKeyChar())) {
+				display = display.substring(0, i) + correct.substring(i,i+1) + display.substring(i+1);
+				word_guess.setText(display);
+				changes ++;
+			}
+		}
+		if (changes == 0) {
+			live --;
+			lives.setText("You have " + live + " lives left.");
+		}
+		if (display.equals(correct)) {
+			JOptionPane.showMessageDialog(frame, "YOU GOT IT");
+			solve ++;
+			live = 9;
+			display = "";
+			Play();
+			lives.setText("You have " + live + " lives left.");
+			solved.setText("You have solved " + solve + " words.");
+		}
+		if (live == 0) {
+			instructions.setText("You Lost");
+			display = "";
+			word_guess.setText(display);
+		}
+
 	}
 
 	@Override
