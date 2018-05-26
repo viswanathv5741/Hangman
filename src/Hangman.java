@@ -48,7 +48,7 @@ public class Hangman implements KeyListener {
 		try {
 			Scanner file = new Scanner(new File("dictionary.txt"));
 			int index = 0;
-			int interval = (int)(Math.random()*100);
+			int interval = (int)(Math.random()*500);
 			while(file.hasNextLine() && index < x){
 				words.add(file.nextLine());
 				index ++;
@@ -60,6 +60,7 @@ public class Hangman implements KeyListener {
 			for (int i=0; i<x; i++) {
 				int rand = (int) (Math.random()*words.size());
 				guess.push(words.get(rand));
+				words.remove(rand);
 //				System.out.println(words.size());
 //				System.out.println(i);
 			}
